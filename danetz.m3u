@@ -1,0 +1,8 @@
+#EXTM3U x-tvg-url="" #EXTINF:-1 tvg-id="" group-title="Infantiles" tvg-logo="https://telecentro.com.ar/img/cm/channels/disneychannel@2x.png", Disney Channel Argentina
+https://api.m3use.projectmoose.xyz/m3u/Danetz3901/FenixTV/6814ffb6b0511451c3f76b15.m3u8?uid=Danetz3901&pkey=JiXtzQ
+#EXTINF:-1 tvg-id="" group-title="Argentina" tvg-logo="https://telecentro.com.ar/img/cm/channels/tn@2x.png", Todo Noticias
+https://api.m3use.projectmoose.xyz/m3u/Danetz3901/FenixTV/6815014b66dcc0d698447cce.m3u8?uid=Danetz3901&pkey=JiXtzQ
+#EXTINF:-1 tvg-id="" group-title="Infantiles" tvg-logo="https://telecentro.com.ar/img/cm/channels/nick@2x.png", Nickelodeon Argentina
+https://api.m3use.projectmoose.xyz/m3u/Danetz3901/FenixTV/681501da66dcc0d698447ccf.m3u8?uid=Danetz3901&pkey=JiXtzQ
+#EXTINF:-1 tvg-id="" group-title="Infantiles" tvg-logo="https://telecentro.com.ar/img/cm/channels/discoverykids.png", Discovery Kids Argentina
+https://api.m3use.projectmoose.xyz/m3u/Danetz3901/FenixTV/681502c0b0511451c3f76b17.m3u8?uid=Danetz3901&pkey=JiXtzQ
