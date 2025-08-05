@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StreamTV Premium</title>
+    <style>
+        :root {
+            --primary: #e50914;
+            --secondary: #b81d24;
+            --dark: #221f1f;
+            --darker: #1a1a1a;
+            --light: #f5f5f1;
+            --gray: #999;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Header móvil */
+        .mobile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--dark);
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .mobile-header .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-header .logo-icon {
+            font-size: 28px;
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .mobile-header .logo h1 {
+            font-size: 18px;
+            color: var(--primary);
+        }
+        
+        .mobile-menu-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: var(--light);
+        }
+        
+        /* Secciones */
+        .app-section {
+            display: none;
+            padding: 20px;
+            margin-top: 60px;
+            padding-bottom: 80px;
+            overflow-y: auto;
+            height: calc(100vh - 140px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .section-active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Sidebar */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .sidebar-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: var(--dark);
+            padding: 20px 0;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1001;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.visible {
+            transform: translateX(0);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .menu {
+            list-style: none;
+        }
+        
+        .menu-item {
+            padding: 15px 25px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(229, 9, 20, 0.2);
+        }
+        
+        .menu-item.active {
+            background-color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .menu-item i {
+            margin-right: 15px;
+            font-size: 20px;
+            min-width: 24px;
+        }
+        
+        /* Controles móviles */
+        .mobile-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--dark);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 999;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .mobile-control-btn {
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .mobile-control-btn span {
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .mobile-control-btn.active {
+            color: var(--primary);
+        }
+        
+        /* Sección Home */
+        .player-container {
+            width: 100%;
+            height: 40vh;
+            background-color: #000;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #video-player {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+        }
+        
+        /* Estilos mejorados para los logos de canales */
+        .channel-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .channel-card {
+            background-color: var(--dark);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+        
+        .channel-card.active {
+            border: 2px solid var(--primary);
+        }
+        
+        .channel-thumb {
+            width: 100%;
+            height: 100%;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .channel-thumb .logo-container {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .channel-thumb .logo-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .channel-thumb .logo-fallback {
+            font-size: 30px;
+            color: white;
+        }
+        
+        .channel-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        }
+        
+        .channel-title {
+            font-size: 12px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .channel-category {
+            font-size: 10px;
+            color: var(--gray);
+        }
+        
+        .favorite-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
+        .favorite-btn i.active {
+            color: var(--primary);
+        }
+        
+        /* Sección Búsqueda */
+        .search-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .search-bar {
+            display: flex;
+            position: relative;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 25px;
+            background-color: rgba(255,255,255,0.1);
+            color: var(--light);
+            font-size: 14px;
+            padding-right: 45px;
+        }
+        
+        .search-button {
+            position: absolute;
+            right: 3px;
+            top: 3px;
+            width: 35px;
+            height: 35px;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-results {
+            margin-top: 20px;
+        }
+        
+        /* Sección Favoritos */
+        .favorites-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--gray);
+        }
+        
+        /* Sección Configuración */
+        .settings-section {
+            margin-top: 20px;
+        }
+        
+        .settings-option {
+            background-color: var(--dark);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .settings-option label {
+            flex: 1;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Media Queries */
+        @media (max-width: 480px) {
+            .channel-list {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .player-container {
+                height: 30vh;
+            }
+        }
+    </style>
+    <!-- Incluir shaka player para soporte MPD -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.7/shaka-player.compiled.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header móvil -->
+    <div class="mobile-header">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-tv"></i></div>
+            <h1>StreamTV</h1>
+        </div>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    
+    <!-- Sidebar y overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-tv"></i></div>
+            <h1>StreamTV</h1>
+        </div>
+        <ul class="menu">
+            <li class="menu-item active" data-section="home">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </li>
+            <li class="menu-item" data-section="search">
+                <i class="fas fa-search"></i>
+                <span>Buscar</span>
+            </li>
+            <li class="menu-item" data-section="favorites">
+                <i class="fas fa-heart"></i>
+                <span>Favoritos</span>
+            </li>
+            <li class="menu-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Secciones de la aplicación -->
+    <div class="container">
+        <!-- Sección Home (S001) -->
+        <section id="home" class="app-section section-active" data-ref="S001">
+            <div class="player-container">
+                <video id="video-player" autoplay playsinline></video>
+            </div>
+            
+            <div class="now-playing" id="now-playing" style="display: none;">
+                <div class="now-playing-icon"><i class="fas fa-play"></i></div>
+                <div class="now-playing-info">
+                    <div class="now-playing-title" id="now-playing-title"></div>
+                    <div class="now-playing-url" id="now-playing-url"></div>
+                </div>
+                <button class="now-playing-close" id="now-playing-close"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="category-tabs">
+                <div class="category-tab active" data-category="all">Todos</div>
+                <div class="category-tab" data-category="tv">TV</div>
+                <div class="category-tab" data-category="movies">Películas</div>
+                <div class="category-tab" data-category="sports">Deportes</div>
+            </div>
+            
+            <div class="channel-list" id="channel-list">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 30px; margin-bottom: 15px;"></i>
+                    <p>Cargando lista de canales...</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Sección Búsqueda (S002) -->
+        <section id="search" class="app-section" data-ref="S002">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Buscar canales..." id="search-input">
+                    <button class="search-button" id="search-button"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            
+            <div class="search-results" id="search-results">
+                <p style="text-align: center; color: var(--gray); margin-top: 50px;">
+                    Ingresa un término de búsqueda para encontrar canales
+                </p>
+            </div>
+        </section>
+        
+        <!-- Sección Favoritos (S003) -->
+        <section id="favorites" class="app-section" data-ref="S003">
+            <h2 style="margin-bottom: 20px;"><i class="fas fa-heart" style="color: var(--primary);"></i> Mis Favoritos</h2>
+            
+            <div class="favorites-list" id="favorites-list">
+                <div class="favorites-empty">
+                    <i class="fas fa-heart" style="font-size: 40px; color: var(--gray); margin-bottom: 15px;"></i>
+                    <p>No tienes canales favoritos aún</p>
+                    <p style="font-size: 14px; margin-top: 10px;">
+                        Agrega canales a favoritos haciendo clic en el corazón <i class="fas fa-heart"></i>
+                    </p>
+                    <button class="btn-discover" style="margin-top: 20px; background: var(--primary); border: none; padding: 10px 20px; border-radius: 20px; color: white;">
+                        <a href="go:S001">Descubrir canales</a>
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Sección Configuración (S004) -->
+        <section id="settings" class="app-section" data-ref="S004">
+            <h2 style="margin-bottom: 20px;"><i class="fas fa-cog" style="color: var(--primary);"></i> Configuración</h2>
+            
+            <div class="settings-section">
+                <h3 style="margin-bottom: 15px;">Reproducción</h3>
+                
+                <div class="settings-option">
+                    <label for="autoplay">Reproducción automática</label>
+                    <label class="switch">
+                        <input type="checkbox" id="autoplay" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-option">
+                    <label for="remember-position">Recordar último canal</label>
+                    <label class="switch">
+                        <input type="checkbox" id="remember-position" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Controles móviles -->
+    <div class="mobile-controls">
+        <button class="mobile-control-btn active" data-section="home">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </button>
+        <button class="mobile-control-btn" data-section="search">
+            <i class="fas fa-search"></i>
+            <span>Buscar</span>
+        </button>
+        <button class="mobile-control-btn" data-section="favorites">
+            <i class="fas fa-heart"></i>
+            <span>Favoritos</span>
+        </button>
+        <button class="mobile-control-btn" data-section="settings">
+            <i class="fas fa-cog"></i>
+            <span>Ajustes</span>
+        </button>
+    </div>
+
+    <script>
+        // URL de la playlist remota
+        const PLAYLIST_URL = 'https://github.com/FenixIPTV/testm3u/raw/refs/heads/main/ARGENTINA%20CON%20PELICULAS.m3u';
+        
+        // Configuración
+        const config = {
+            autoplay: true,
+            rememberPosition: true,
+            favorites: [],
+            channels: [],
+            player: null
+        };
+
+        // Inicializar Shaka Player
+        function initShakaPlayer() {
+            const video = document.getElementById('video-player');
+            config.player = new shaka.Player(video);
+            
+            // Manejar errores
+            config.player.addEventListener('error', onPlayerError);
+        }
+
+        // Manejar errores del reproductor
+        function onPlayerError(event) {
+            console.error('Error del reproductor:', event.detail);
+            showError('Error al reproducir el canal');
+        }
+
+        // Cargar configuración
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('streamtv-config');
+            if (savedConfig) {
+                Object.assign(config, JSON.parse(savedConfig));
+                document.getElementById('autoplay').checked = config.autoplay;
+                document.getElementById('remember-position').checked = config.rememberPosition;
+            }
+            
+            // Inicializar Shaka Player
+            shaka.polyfill.installAll();
+            if (shaka.Player.isBrowserSupported()) {
+                initShakaPlayer();
+            } else {
+                console.error('Shaka Player no es compatible con este navegador');
+            }
+            
+            // Cargar canales desde localStorage si existen
+            const savedChannels = localStorage.getItem('streamtv-channels');
+            if (savedChannels) {
+                config.channels = JSON.parse(savedChannels);
+                displayChannels(config.channels);
+            } else {
+                // Cargar playlist remota
+                loadRemotePlaylist();
+            }
+        }
+
+        // Cargar playlist remota
+        async function loadRemotePlaylist() {
+            try {
+                const response = await fetch(PLAYLIST_URL);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const playlistContent = await response.text();
+                
+                if (!playlistContent.startsWith('#EXTM3U')) {
+                    throw new Error('El archivo no parece ser una playlist M3U válida');
+                }
+                
+                // Parsear la playlist
+                const channels = parseM3U(playlistContent);
+                config.channels = channels;
+                
+                // Guardar en localStorage para acceso offline
+                localStorage.setItem('streamtv-playlist', playlistContent);
+                localStorage.setItem('streamtv-channels', JSON.stringify(channels));
+                
+                // Mostrar canales
+                displayChannels(channels);
+                
+            } catch (error) {
+                console.error('Error cargando playlist remota:', error);
+                
+                // Intentar cargar desde caché
+                const cachedPlaylist = localStorage.getItem('streamtv-playlist');
+                const cachedChannels = localStorage.getItem('streamtv-channels');
+                
+                if (cachedPlaylist && cachedChannels) {
+                    showStatus('Usando versión en caché de la playlist');
+                    config.channels = JSON.parse(cachedChannels);
+                    displayChannels(config.channels);
+                } else {
+                    showError('Error al cargar la playlist. Intenta más tarde.');
+                    document.getElementById('channel-list').innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 30px; margin-bottom: 15px; color: var(--primary);"></i>
+                            <p>Error al cargar la playlist</p>
+                            <p style="font-size: 14px; color: var(--gray); margin-top: 10px;">${error.message}</p>
+                            <button class="btn-retry" style="margin-top: 20px; background: var(--primary); border: none; padding: 10px 20px; border-radius: 20px; color: white;">
+                                Reintentar
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.querySelector('.btn-retry').addEventListener('click', loadRemotePlaylist);
+                }
+            }
+        }
+
+        // Parsear playlist M3U
+        function parseM3U(content) {
+            const channels = [];
+            const lines = content.split('\n');
+            let currentChannel = {};
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.startsWith('#EXTINF:')) {
+                    const params = line.substring(8).split(',');
+                    const metadata = params[0];
+                    const name = params.slice(1).join(',');
+                    
+                    const tvgIdMatch = metadata.match(/tvg-id="([^"]*)"/);
+                    const tvgNameMatch = metadata.match(/tvg-name="([^"]*)"/);
+                    const tvgLogoMatch = metadata.match(/tvg-logo="([^"]*)"/);
+                    const groupTitleMatch = metadata.match(/group-title="([^"]*)"/);
+                    
+                    currentChannel = {
+                        name: name,
+                        tvgId: tvgIdMatch ? tvgIdMatch[1] : '',
+                        tvgName: tvgNameMatch ? tvgNameMatch[1] : '',
+                        tvgLogo: tvgLogoMatch ? tvgLogoMatch[1] : '',
+                        groupTitle: groupTitleMatch ? groupTitleMatch[1].toLowerCase() : 'tv',
+                        url: '',
+                        isFavorite: config.favorites.includes(name)
+                    };
+                } else if (line.startsWith('http') || line.startsWith('rtmp') || line.startsWith('rtsp')) {
+                    currentChannel.url = line;
+                    channels.push(currentChannel);
+                    currentChannel = {};
+                } else if (line.startsWith('#EXTGRP:')) {
+                    if (currentChannel) {
+                        currentChannel.groupTitle = line.substring(8).toLowerCase();
+                    }
+                }
+            }
+            
+            return channels;
+        }
+
+        // Guardar configuración
+        function saveConfig() {
+            config.autoplay = document.getElementById('autoplay').checked;
+            config.rememberPosition = document.getElementById('remember-position').checked;
+            localStorage.setItem('streamtv-config', JSON.stringify(config));
+        }
+
+        // Mostrar canales
+        function displayChannels(channels, filter = 'all', searchTerm = '') {
+            const channelList = document.getElementById('channel-list');
+            
+            // Aplicar filtros
+            let filteredChannels = channels.filter(channel => {
+                const matchesCategory = filter === 'all' || channel.groupTitle === filter;
+                const matchesSearch = searchTerm === '' || 
+                    channel.name.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+            
+            if (filteredChannels.length === 0) {
+                channelList.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+                        <i class="fas fa-tv" style="font-size: 30px; margin-bottom: 15px; color: var(--gray);"></i>
+                        <p>No se encontraron canales</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            channelList.innerHTML = '';
+            filteredChannels.forEach((channel, index) => {
+                channel.index = index; // Guardar índice original para referencia
+                
+                const channelCard = document.createElement('div');
+                channelCard.className = `channel-card ${channel.isFavorite ? 'favorite' : ''}`;
+                channelCard.dataset.index = index;
+                channelCard.dataset.category = channel.groupTitle;
+                
+                channelCard.innerHTML = `
+                    <div class="channel-thumb">
+                        <div class="logo-container">
+                            ${channel.tvgLogo ? 
+                                `<img class="logo-img" src="${channel.tvgLogo}" alt="${channel.name}" 
+                                      onerror="this.parentNode.innerHTML='<div class=\\'logo-fallback\\'>${channel.name.charAt(0)}</div>'">` : 
+                                `<div class="logo-fallback">${channel.name.charAt(0)}</div>`}
+                        </div>
+                        <button class="favorite-btn" data-channel="${encodeURIComponent(channel.name)}">
+                            <i class="fas fa-heart ${channel.isFavorite ? 'active' : ''}"></i>
+                        </button>
+                    </div>
+                    <div class="channel-info">
+                        <div class="channel-title">${channel.name}</div>
+                        <div class="channel-category">${channel.groupTitle}</div>
+                    </div>
+                `;
+                
+                channelCard.addEventListener('click', () => playChannel(channel));
+                
+                const favoriteBtn = channelCard.querySelector('.favorite-btn');
+                favoriteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(channel);
+                });
+                
+                channelList.appendChild(channelCard);
+            });
+        }
+
+        // Reproducir canal
+        async function playChannel(channel) {
+            const videoPlayer = document.getElementById('video-player');
+            const nowPlaying = document.getElementById('now-playing');
+            
+            document.getElementById('now-playing-title').textContent = channel.name;
+            document.getElementById('now-playing-url').textContent = channel.url;
+            nowPlaying.style.display = 'flex';
+            
+            try {
+                // Detener reproducción actual
+                if (config.player) {
+                    await config.player.unload();
+                }
+                
+                // Cargar nuevo stream
+                if (channel.url.endsWith('.mpd')) {
+                    // Es un stream MPD (DASH)
+                    await config.player.load(channel.url);
+                } else {
+                    // Es un stream HLS u otro tipo
+                    videoPlayer.src = channel.url;
+                    await videoPlayer.load();
+                    if (config.autoplay) {
+                        await videoPlayer.play();
+                    }
+                }
+                
+                // Mostrar controles nativos para streams no-DASH
+                videoPlayer.controls = !channel.url.endsWith('.mpd');
+                
+            } catch (error) {
+                console.error('Error al reproducir:', error);
+                showError('Error al reproducir el canal');
+                return;
+            }
+            
+            // Marcar como activo
+            document.querySelectorAll('.channel-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`.channel-card[data-index="${channel.index}"]`).classList.add('active');
+            
+            if (config.rememberPosition) {
+                localStorage.setItem('streamtv-last-channel', JSON.stringify(channel));
+            }
+        }
+
+        // Mostrar error
+        function showError(message) {
+            const channelList = document.getElementById('channel-list');
+            channelList.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 20px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 30px; margin-bottom: 15px; color: var(--primary);"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Mostrar mensaje de estado
+        function showStatus(message) {
+            const channelList = document.getElementById('channel-list');
+            channelList.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 20px;">
+                    <i class="fas fa-info-circle" style="font-size: 30px; margin-bottom: 15px; color: var(--primary);"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Alternar favorito
+        function toggleFavorite(channel) {
+            const index = config.favorites.indexOf(channel.name);
+            
+            if (index === -1) {
+                config.favorites.push(channel.name);
+                channel.isFavorite = true;
+            } else {
+                config.favorites.splice(index, 1);
+                channel.isFavorite = false;
+            }
+            
+            localStorage.setItem('streamtv-config', JSON.stringify(config));
+            localStorage.setItem('streamtv-channels', JSON.stringify(config.channels));
+            
+            // Actualizar UI
+            document.querySelectorAll(`.favorite-btn[data-channel="${encodeURIComponent(channel.name)}"]`).forEach(btn => {
+                btn.querySelector('i').classList.toggle('active', channel.isFavorite);
+            });
+            
+            // Actualizar lista de favoritos si estamos en esa sección
+            if (document.getElementById('favorites').classList.contains('section-active')) {
+                updateFavoritesList();
+            }
+        }
+
+        // Actualizar lista de favoritos
+        function updateFavoritesList() {
+            const favoritesList = document.getElementById('favorites-list');
+            const favoriteChannels = config.channels.filter(channel => channel.isFavorite);
+            
+            if (favoriteChannels.length === 0) {
+                favoritesList.innerHTML = `
+                    <div class="favorites-empty">
+                        <i class="fas fa-heart" style="font-size: 40px; color: var(--gray); margin-bottom: 15px;"></i>
+                        <p>No tienes canales favoritos aún</p>
+                        <p style="font-size: 14px; margin-top: 10px;">
+                            Agrega canales a favoritos haciendo clic en el corazón <i class="fas fa-heart"></i>
+                        </p>
+                        <button class="btn-discover" style="margin-top: 20px; background: var(--primary); border: none; padding: 10px 20px; border-radius: 20px; color: white;">
+                            <a href="go:S001">Descubrir canales</a>
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            favoritesList.innerHTML = '<div class="channel-list"></div>';
+            const channelList = favoritesList.querySelector('.channel-list');
+            
+            favoriteChannels.forEach((channel, index) => {
+                const channelCard = document.createElement('div');
+                channelCard.className = 'channel-card';
+                channel.index = index; // Actualizar índice para referencia
+                
+                channelCard.innerHTML = `
+                    <div class="channel-thumb">
+                        <div class="logo-container">
+                            ${channel.tvgLogo ? 
+                                `<img class="logo-img" src="${channel.tvgLogo}" alt="${channel.name}" 
+                                      onerror="this.parentNode.innerHTML='<div class=\\'logo-fallback\\'>${channel.name.charAt(0)}</div>'">` : 
+                                `<div class="logo-fallback">${channel.name.charAt(0)}</div>`}
+                        </div>
+                        <button class="favorite-btn" data-channel="${encodeURIComponent(channel.name)}">
+                            <i class="fas fa-heart active"></i>
+                        </button>
+                    </div>
+                    <div class="channel-info">
+                        <div class="channel-title">${channel.name}</div>
+                        <div class="channel-category">${channel.groupTitle}</div>
+                    </div>
+                `;
+                
+                channelCard.addEventListener('click', () => playChannel(channel));
+                
+                const favoriteBtn = channelCard.querySelector('.favorite-btn');
+                favoriteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(channel);
+                });
+                
+                channelList.appendChild(channelCard);
+            });
+        }
+
+        // Cambiar sección
+        function showSection(sectionId) {
+            document.querySelectorAll('.app-section').forEach(section => {
+                section.classList.remove('section-active');
+            });
+            
+            document.getElementById(sectionId).classList.add('section-active');
+            
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.section === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('.mobile-control-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.section === sectionId) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Actualizar lista de favoritos si es necesario
+            if (sectionId === 'favorites') {
+                updateFavoritesList();
+            }
+        }
+
+        // Alternar menú móvil
+        function toggleMobileMenu() {
+            document.getElementById('sidebar').classList.toggle('visible');
+            document.getElementById('sidebar-overlay').classList.toggle('visible');
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            
+            // Menú móvil
+            document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('sidebar-overlay').addEventListener('click', toggleMobileMenu);
+            
+            // Navegación
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    showSection(item.dataset.section);
+                    toggleMobileMenu();
+                });
+            });
+            
+            document.querySelectorAll('.mobile-control-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    showSection(btn.dataset.section);
+                });
+            });
+            
+            // Configuración
+            document.getElementById('autoplay').addEventListener('change', saveConfig);
+            document.getElementById('remember-position').addEventListener('change', saveConfig);
+            
+            // Cerrar now playing
+            document.getElementById('now-playing-close').addEventListener('click', () => {
+                document.getElementById('now-playing').style.display = 'none';
+            });
+            
+            // Búsqueda
+            document.getElementById('search-button').addEventListener('click', () => {
+                const searchTerm = document.getElementById('search-input').value;
+                const resultsContainer = document.getElementById('search-results');
+                
+                if (searchTerm.trim() === '') {
+                    resultsContainer.innerHTML = '<p style="text-align: center; color: var(--gray);">Ingresa un término de búsqueda</p>';
+                    return;
+                }
+                
+                resultsContainer.innerHTML = '<div class="channel-list"></div>';
+                displayChannels(config.channels, 'all', searchTerm);
+            });
+            
+            // Categorías
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    displayChannels(config.channels, tab.dataset.category);
+                });
+            });
+            
+            // Enlaces internos
+            document.querySelectorAll('[href^="go:"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const ref = this.getAttribute('href').split(':')[1];
+                    const section = document.querySelector(`[data-ref="${ref}"]`);
+                    if (section) {
+                        showSection(section.id);
+                    }
+                });
+            });
+            
+            // Cargar último canal reproducido
+            if (config.rememberPosition) {
+                const lastChannel = localStorage.getItem('streamtv-last-channel');
+                if (lastChannel) {
+                    try {
+                        const channel = JSON.parse(lastChannel);
+                        playChannel(channel);
+                    } catch (e) {
+                        console.error('Error al cargar último canal:', e);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
