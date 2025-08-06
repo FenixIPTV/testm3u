@@ -65,10 +65,6 @@ https://access.cdn.rcs.net.ar/mnp/79sgpei8yp2kn0ledlptzl8nz5tjc3lz/output.mpd
 http://179.51.136.23:8000/play/a07d/index.m3u8
 #EXTINF:-1 tvg-id="(no tvg-id)" tvg-name="" tvg-logo="https://github.com/FenixIPTV/LogosTV/blob/main/Entretenimiento/magazine.png?raw=true" group-title="Argentina",Ciudad Magazine HD
 https://api.m3use.projectmoose.xyz/m3u/Danetz3901/FenixTV/681041165bda46552a55a1d9.m3u8?uid=Danetz3901&pkey=JiXtzQ
-#EXTINF:-1 tvg-id="(no tvg-id)" tvg-name="" tvg-logo="" group-title="Argentina",ATCCO Canal 2 HD
-https://ola1.com.ar/atccohd/index.mpd
-#EXTINF:-1 tvg-id="(no tvg-id)" tvg-name="" tvg-logo="" group-title="Argentina",AVC Canal 2 HD
-https://ola1.com.ar/avc/index.mpd
 #EXTINF:-1 tvg-id="(no tvg-id)" tvg-name="" tvg-logo="https://github.com/FenixIPTV/LogosTV/blob/main/Colombia/cablenoticias.png?raw=true" group-title="Colombia",Cable Noticias
 https://metalgear.bemtv.cn/STREAM/22860/playlist.m3u8
 #EXTINF:-1 tvg-id="(no tvg-id)" tvg-name="" tvg-logo="https://github.com/FenixIPTV/LogosTV/blob/main/Colombia/caracol.png?raw=true" group-title="Colombia",Canal Caracol HD
